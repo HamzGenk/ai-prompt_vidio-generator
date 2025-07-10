@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal AI Video Prompt Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .platform-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .platform-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .platform-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .platform-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .platform-card .duration {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .content-type-selector {
+            margin-bottom: 30px;
+        }
+
+        .content-type-selector h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .content-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .content-type-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .content-type-btn:hover {
+            background: #e9ecef;
+        }
+
+        .content-type-btn.selected {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .label-help {
+            font-size: 0.8em;
+            color: #666;
+            font-weight: normal;
+            margin-top: 2px;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .translate-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #4caf50;
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::before {
+            transform: translateX(26px);
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .output-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .output-header h3 {
+            color: #333;
+        }
+
+        .platform-info {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .ai-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+
+        .rating-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        #output {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            min-height: 150px;
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn.copy {
+            background: #17a2b8;
+        }
+
+        .action-btn.translate {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .action-btn.platform {
+            background: #dc3545;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .tips-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .tips-section h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .tip-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tip-card h4 {
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                text-align: center;
+            }
+        }
+
+        /* Dalam .form-group */
+        input[type="file"] {
+            padding: 10px;
+            /* Lebih kecil dari input lain karena biasanya ada tombol browse */
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            background-color: white;
+            /* Pastikan background putih */
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Universal AI Video Prompt Generator</h1>
+            <p>Buat video AI yang menakjubkan dengan prompt yang mudah dipahami untuk berbagai platform</p>
+        </div>
+
+        <div class="form-container">
+            <div class="platform-selector">
+                <div class="platform-card" onclick="selectPlatform('veo3')">
+                    <h3>Veo 3</h3>
+                    <div class="duration">Max 8 detik</div>
+                </div>
+                <div class="platform-card" onclick="selectPlatform('runway')">
+                    <h3>Runway</h3>
+                    <div class="duration">Max 10 detik</div>
+                </div>
+                <div class="platform-card" onclick="selectPlatform('pika')">
+                    <h3>Pika Labs</h3>
+                    <div class="duration">Max 3 detik</div>
+                </div>
+                <div class="platform-card" onclick="selectPlatform('stable')">
+                    <h3>Stable Video</h3>
+                    <div class="duration">Max 25 detik</div>
+                </div>
+                <div class="platform-card" onclick="selectPlatform('luma')">
+                    <h3>Luma Dream</h3>
+                    <div class="duration">Max 5 detik</div>
+                </div>
+            </div>
+
+            <div class="content-type-selector">
+                <h3>Pilih Jenis Konten Video:</h3>
+                <div class="content-types">
+                    <div class="content-type-btn" onclick="selectContentType('product')">📱 Promosi Produk</div>
+                    <div class="content-type-btn" onclick="selectContentType('landscape')">🏞️ Pemandangan Alam</div>
+                    <div class="content-type-btn" onclick="selectContentType('conversation')">💬 Percakapan/Dialog</div>
+                    <div class="content-type-btn" onclick="selectContentType('food')">🍔 Makanan & Minuman</div>
+                    <div class="content-type-btn" onclick="selectContentType('fashion')">👗 Fashion & Lifestyle</div>
+                    <div class="content-type-btn" onclick="selectContentType('tutorial')">🎓 Tutorial/Edukasi</div>
+                    <div class="content-type-btn" onclick="selectContentType('travel')">✈️ Travel & Wisata</div>
+                    <div class="content-type-btn" onclick="selectContentType('business')">💼 Bisnis & Kantor</div>
+                </div>
+            </div>
+
+            <div class="translate-toggle">
+                <div class="toggle-switch" id="translateToggle" onclick="toggleTranslate()"></div>
+                <span>🌐 Otomatis terjemahkan ke bahasa Inggris (Prompt AI lebih akurat)</span>
+            </div>
+
+            <form id="promptForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Durasi Video:
+                            <div class="label-help">Berapa lama video yang ingin dibuat?</div>
+                        </label>
+                        <select id="durasi">
+                            <option value="3s">3 detik</option>
+                            <option value="5s">5 detik</option>
+                            <option value="8s">8 detik</option>
+                            <option value="10s">10 detik</option>
+                            <option value="15s">15 detik</option>
+                            <option value="25s">25 detik</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Format Video:
+                            <div class="label-help">Pilih sesuai platform tujuan</div>
+                        </label>
+                        <select id="rasio">
+                            <option value="16:9">16:9 (YouTube, TV)</option>
+                            <option value="9:16">9:16 (TikTok, Instagram Stories)</option>
+                            <option value="1:1">1:1 (Instagram Post)</option>
+                            <option value="4:3">4:3 (Facebook)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apa/Siapa yang ingin ditampilkan:
+                            <div class="label-help">Contoh: seorang wanita, produk smartphone, kucing</div>
+                        </label>
+                        <input type="text" id="subjek" placeholder="Masukkan subjek utama video">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dimana lokasinya:
+                            <div class="label-help">Contoh: di pantai, di studio, di rumah</div>
+                        </label>
+                        <input type="text" id="lokasi" placeholder="Masukkan lokasi atau tempat">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Ceritakan detail yang ingin ditampilkan:
+                            <div class="label-help">Jelaskan dengan bahasa sehari-hari apa yang terjadi di video</div>
+                        </label>
+                        <textarea id="deskripsi"
+                            placeholder="Contoh: Seorang wanita sedang memegang smartphone sambil tersenyum di teras rumah yang menghadap ke taman..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apa yang dilakukan:
+                            <div class="label-help">Contoh: berjalan, tersenyum, menunjukkan produk</div>
+                        </label>
+                        <input type="text" id="aktivitas" placeholder="Masukkan aktivitas atau gerakan">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Suasana yang diinginkan:
+                            <div class="label-help">Contoh: gembira, romantis, serius, santai</div>
+                        </label>
+                        <select id="suasana">
+                            <option value="gembira dan ceria">Gembira dan Ceria</option>
+                            <option value="romantis dan hangat">Romantis dan Hangat</option>
+                            <option value="serius dan profesional">Serius dan Profesional</option>
+                            <option value="santai dan rileks">Santai dan Rileks</option>
+                            <option value="dramatis dan menegangkan">Dramatis dan Menegangkan</option>
+                            <option value="misterius dan gelap">Misterius dan Gelap</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pencahayaan:
+                            <div class="label-help">Bagaimana cahaya di video?</div>
+                        </label>
+                        <select id="pencahayaan">
+                            <option value="cahaya alami">Cahaya Alami (siang hari)</option>
+                            <option value="cahaya sore emas">Cahaya Sore Emas</option>
+                            <option value="cahaya studio lembut">Cahaya Studio Lembut</option>
+                            <option value="cahaya dramatis">Cahaya Dramatis</option>
+                            <option value="cahaya dari belakang">Cahaya dari Belakang</option>
+                            <option value="cahaya neon">Cahaya Neon</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gaya Video:
+                            <div class="label-help">Seperti apa tampilan video yang diinginkan?</div>
+                        </label>
+                        <select id="gaya">
+                            <option value="seperti film bioskop">Seperti Film Bioskop</option>
+                            <option value="realistis seperti aslinya">Realistis Seperti Aslinya</option>
+                            <option value="artistik dan kreatif">Artistik dan Kreatif</option>
+                            <option value="iklan komersial">Iklan Komersial</option>
+                            <option value="vintage klasik">Vintage Klasik</option>
+                            <option value="modern dan futuristik">Modern dan Futuristik</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Warna Dominan:
+                            <div class="label-help">Warna apa yang ingin menonjol?</div>
+                        </label>
+                        <select id="warna">
+                            <option value="warna hangat keemasan">Warna Hangat Keemasan</option>
+                            <option value="warna dingin biru">Warna Dingin Biru</option>
+                            <option value="warna cerah dan hidup">Warna Cerah dan Hidup</option>
+                            <option value="warna netral dan elegan">Warna Netral dan Elegan</option>
+                            <option value="hitam putih">Hitam Putih</option>
+                            <option value="warna pastel lembut">Warna Pastel Lembut</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gerakan Kamera:
+                            <div class="label-help">Bagaimana kamera bergerak?</div>
+                        </label>
+                        <select id="kamera">
+                            <option value="kamera diam">Kamera Diam</option>
+                            <option value="kamera bergerak perlahan">Kamera Bergerak Perlahan</option>
+                            <option value="kamera mendekat">Kamera Mendekat</option>
+                            <option value="kamera menjauh">Kamera Menjauh</option>
+                            <option value="kamera berputar">Kamera Berputar</option>
+                            <option value="kamera goyang alami">Kamera Goyang Alami</option>
+                            <option value="kamera dari atas">Kamera dari Atas (Drone)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jarak Pengambilan:
+                            <div class="label-help">Seberapa dekat kamera dengan subjek?</div>
+                        </label>
+                        <select id="shot">
+                            <option value="gambar luas">Gambar Luas (seluruh tubuh)</option>
+                            <option value="gambar sedang">Gambar Sedang (pinggang ke atas)</option>
+                            <option value="gambar dekat">Gambar Dekat (wajah)</option>
+                            <option value="gambar sangat dekat">Gambar Sangat Dekat (mata/detail)</option>
+                            <option value="gambar pemandangan">Gambar Pemandangan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sudut Pandang Kamera:
+                            <div class="label-help">Dari mana kamera melihat adegan?</div>
+                        </label>
+                        <select id="sudut_pandang">
+                            <option value="normal eye-level view">Normal (Setinggi Mata)</option>
+                            <option value="low angle shot">Sudut Rendah</option>
+                            <option value="high angle shot">Sudut Tinggi</option>
+                            <option value="overhead view (drone shot)">Dari Atas (Drone/POV)</option>
+                            <option value="first-person view">Sudut Pandang Orang Pertama</option>
+                            <option value="dutch angle">Sudut Miring (Dutch Angle)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gaya Visual/Rendering:
+                            <div class="label-help">Detail visual dan tingkat realisme.</div>
+                        </label>
+                        <select id="gaya_visual">
+                            <option value="realistic">Realistis</option>
+                            <option value="hyper-realistic">Hiper-Realistis</option>
+                            <option value="stylized">Bergaya (Stylized)</option>
+                            <option value="cartoonish">Kartun</option>
+                            <option value="abstract">Abstrak</option>
+                            <option value="cinematic film grain">Sinematik (Film Grain)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Teks atau Ucapan (opsional):
+                            <div class="label-help">Apa yang dikatakan atau teks yang muncul?</div>
+                        </label>
+                        <input type="text" id="dialog" placeholder="Masukkan dialog atau teks yang ingin ditampilkan">
+                    </div>
+                    <div class="form-group full-width" id="imageInputGroup" style="display: none;">
+                        <label>Unggah Gambar Referensi (untuk Image-to-Video Runway):
+                            <div class="label-help">Pilih gambar yang ingin Anda animasikan.</div>
+                        </label>
+                        <input type="file" id="imageUpload" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Suara Latar:
+                            <div class="label-help">Suara apa yang terdengar di video?</div>
+                        </label>
+                        <input type="text" id="suara" placeholder="Contoh: suara ombak, langkah kaki, suara kota">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Musik Latar:
+                            <div class="label-help">Jenis musik yang cocok</div>
+                        </label>
+                        <select id="musik">
+                            <option value="tanpa musik">Tanpa Musik</option>
+                            <option value="musik tenang">Musik Tenang</option>
+                            <option value="musik orkestra">Musik Orkestra</option>
+                            <option value="musik elektronik">Musik Elektronik</option>
+                            <option value="musik akustik">Musik Akustik</option>
+                            <option value="musik ceria">Musik Ceria</option>
+                            <option value="musik seperti film">Musik Seperti Film</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" class="generate-btn" onclick="generatePrompt()" id="generateBtn">
+                    🚀 Buat Prompt Video
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Sedang membuat prompt yang sempurna...</p>
+            </div>
+
+            <div class="output-container" id="outputContainer" style="display: none;">
+                <div class="output-header">
+                    <h3>Prompt Video Siap Pakai:</h3>
+                    <div class="platform-info" id="platformInfo">Veo 3</div>
+                </div>
+
+                <div class="ai-rating" id="aiRating">
+                    <div class="rating-stars" id="ratingStars"></div>
+                    <div class="rating-text" id="ratingText"></div>
+                </div>
+
+                <div id="output"></div>
+
+                <div class="action-buttons">
+                    <button class="action-btn copy" onclick="copyPrompt()">📋 Salin Prompt</button>
+                    <button class="action-btn translate" onclick="openTranslator()">🌐 Buka Translator</button>
+                    <a href="#" id="platformLink" class="action-btn platform" target="_blank">🎬 Buka Platform AI</a>
+                </div>
+            </div>
+
+            <div class="tips-section">
+                <h3>💡 Tips untuk Hasil Video AI Terbaik:</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <h4>🎯 Promosi Produk</h4>
+                        <p>Fokus pada detail produk, gunakan gerakan rotasi 360°, dan tambahkan narasi singkat yang
+                            menarik.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🌅 Pemandangan Alam</h4>
+                        <p>Highlight warna dan pencahayaan natural, gunakan gerakan kamera lambat untuk efek dramatis.
+                        </p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>💬 Percakapan</h4>
+                        <p>Sertakan karakter multiple, script pendek, dan fokus pada ekspresi wajah.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🍕 Makanan & Minuman</h4>
+                        <p>Gunakan close-up shot, cahaya hangat, dan tampilkan tekstur serta warna makanan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ... kode yang sudah ada ...
+
+            // Set default selections
+            document.querySelector('.platform-card').classList.add('selected');
+            document.querySelector('.content-type-btn').classList.add('selected');
+
+            // Initialize duration options
+            updateDurationOptions();
+
+            // Fill with default template
+            fillFormWithTemplate('product');
+
+            // Initial check for image input visibility
+            updateImageInputVisibility(); // <--- TAMBAHKAN INI
+        });
+        let selectedPlatform = 'veo3';
+        let selectedContentType = 'product';
+        let autoTranslate = false;
+
+        // Platform data
+        const platforms = {
+            veo3: {
+                name: 'Veo 3',
+                maxDuration: 8,
+                url: 'https://gemini.google.com/app',
+                optimization: 'cinematic'
+            },
+            runway: {
+                name: 'Runway',
+                maxDuration: 10,
+                url: 'https://runwayml.com',
+                optimization: 'creative'
+            },
+            pika: {
+                name: 'Pika Labs',
+                maxDuration: 3,
+                url: 'https://pika.art',
+                optimization: 'simple'
+            },
+            stable: {
+                name: 'Stable Video',
+                maxDuration: 25,
+                url: 'https://stability.ai',
+                optimization: 'technical'
+            },
+            luma: {
+                name: 'Luma Dream',
+                maxDuration: 5,
+                url: 'https://lumalabs.ai',
+                optimization: 'narrative'
+            }
+        };
+
+        // Content type templates
+        const contentTemplates = {
+            product: {
+                subjek: 'produk yang ingin dipromosikan',
+                lokasi: 'studio dengan background bersih dan menarik',
+                aktivitas: 'menunjukkan produk dengan gerakan memutar 360 derajat',
+                suasana: 'profesional dan premium',
+                deskripsi: 'Produk ditampilkan dengan pencahayaan sempurna, menonjolkan detail dan kualitas premium'
+            },
+            landscape: {
+                subjek: 'pemandangan alam yang indah',
+                lokasi: 'lokasi alam terbuka',
+                aktivitas: 'pergerakan alami seperti angin sepoi-sepoi',
+                suasana: 'tenang dan menakjubkan',
+                deskripsi: 'Pemandangan alam dengan warna-warna natural yang memukau dan gerakan perlahan'
+            },
+            conversation: {
+                subjek: 'dua orang yang sedang berbicara',
+                lokasi: 'tempat yang nyaman untuk ngobrol',
+                aktivitas: 'berbicara dengan ekspresi natural',
+                suasana: 'hangat dan akrab',
+                deskripsi: 'Percakapan natural dengan fokus pada ekspresi wajah dan bahasa tubuh'
+            },
+            food: {
+                subjek: 'makanan atau minuman yang menggugah selera',
+                lokasi: 'meja makan yang tertata rapi',
+                aktivitas: 'steam mengepul atau gerakan slow motion',
+                suasana: 'mengundang selera',
+                deskripsi: 'Makanan dengan tekstur dan warna yang menarik, pencahayaan hangat yang menggugah selera'
+            },
+            fashion: {
+                subjek: 'model yang mengenakan pakaian',
+                lokasi: 'lokasi yang sesuai dengan gaya fashion',
+                aktivitas: 'berpose atau berjalan dengan gaya',
+                suasana: 'stylish dan elegan',
+                deskripsi: 'Model tampil dengan confident, menonjolkan detail fashion dan style'
+            },
+            tutorial: {
+                subjek: 'instruktur atau demonstrator',
+                lokasi: 'ruang yang mendukung pembelajaran',
+                aktivitas: 'menjelaskan atau mendemonstrasikan',
+                suasana: 'edukatif dan mudah dipahami',
+                deskripsi: 'Penjelasan step by step yang jelas dan mudah diikuti'
+            },
+            travel: {
+                subjek: 'pemandangan wisata atau traveler',
+                lokasi: 'destinasi wisata yang menarik',
+                aktivitas: 'menjelajahi atau menikmati pemandangan',
+                suasana: 'petualangan dan kebebasan',
+                deskripsi: 'Perjalanan yang menginspirasi dengan pemandangan indah dan pengalaman berkesan'
+            },
+            business: {
+                subjek: 'profesional atau suasana kantor',
+                lokasi: 'ruang kantor modern',
+                aktivitas: 'bekerja atau presentasi',
+                suasana: 'profesional dan produktif',
+                deskripsi: 'Lingkungan kerja yang profesional dengan fokus pada produktivitas dan inovasi'
+            }
+        };
+
+        // Enhanced content templates with specific prompts (updated)
+        const enhancedContentTemplates = {
+            product: {
+                promptStyle: 'Fokus pada detail produk dengan pencahayaan studio profesional',
+                cameraMovement: 'Gerakan kamera 360° untuk menampilkan semua sisi produk',
+                lighting: 'Cahaya soft box untuk menghilangkan bayangan keras',
+                duration: 'Durasi ideal 5-8 detik untuk showcase produk',
+                tips: 'Gunakan background netral, highlight fitur utama, tambahkan teks produk',
+                renderingStyle: 'hyper-realistic', // Added
+                cameraPerspective: 'normal eye-level view' // Added
+            },
+            landscape: {
+                promptStyle: 'Pemandangan alam dengan warna natural dan gerakan organic',
+                cameraMovement: 'Gerakan kamera lambat untuk efek dramatik',
+                lighting: 'Cahaya golden hour atau blue hour untuk suasana magis',
+                duration: 'Durasi 8-15 detik untuk memberi waktu apresiasi',
+                tips: 'Gunakan wide shot, tambahkan elemen bergerak seperti awan atau air',
+                renderingStyle: 'realistic', // Added
+                cameraPerspective: 'overhead view (drone shot)' // Added
+            },
+            conversation: {
+                promptStyle: 'Dialogue-driven scene with natural character interaction and emotive expressions.', // Lebih fokus pada dialog dan emosi
+                cameraMovement: 'Shot-reverse-shot, medium close-ups focusing on facial expressions, or smooth panning between speakers.', // Gerakan kamera untuk percakapan
+                lighting: 'Soft, intimate lighting that highlights facial features, warm tones for comfort.', // Pencahayaan untuk intimacy
+                duration: 'Duration should accommodate full dialogue length, typically 10-25 seconds.',
+                tips: 'Ensure lip-sync is accurate, focus on realistic gestures, clear audio is crucial, character backstory is a plus.', // Tips baru termasuk lip-sync
+                renderingStyle: 'realistic',
+                cameraPerspective: 'normal eye-level view'
+            },
+            food: {
+                promptStyle: 'Close-up makanan dengan tekstur dan warna menggugah selera',
+                cameraMovement: 'Slow motion untuk aksi seperti penuangan atau potongan',
+                lighting: 'Cahaya hangat untuk membuat makanan terlihat fresh',
+                duration: 'Durasi 3-5 detik untuk impact maksimal',
+                tips: 'Tampilkan steam, kondensasi, atau gerakan slow motion',
+                renderingStyle: 'realistic', // Added
+                cameraPerspective: 'high angle shot' // Added
+            },
+            fashion: {
+                promptStyle: 'Model dengan outfit yang menonjol dan pose dinamis',
+                cameraMovement: 'Tracking shot mengikuti gerakan model',
+                lighting: 'Cahaya fashion photography dengan contrast yang baik',
+                duration: 'Durasi 5-10 detik untuk showcase outfit',
+                tips: 'Fokus pada detail fabric, warna, dan style movement',
+                renderingStyle: 'stylized', // Added
+                cameraPerspective: 'normal eye-level view' // Added
+            },
+            tutorial: {
+                promptStyle: 'Step by step demonstration yang mudah diikuti',
+                cameraMovement: 'Static shot dengan fokus pada tangan dan objek',
+                lighting: 'Cahaya merata untuk visibility yang baik',
+                duration: 'Durasi 15-25 detik untuk penjelasan lengkap',
+                tips: 'Gunakan close-up untuk detail, tambahkan teks instruksi',
+                renderingStyle: 'realistic', // Added
+                cameraPerspective: 'normal eye-level view' // Added
+            },
+            travel: {
+                promptStyle: 'Adventure dan eksplorasi dengan sense of wonder',
+                cameraMovement: 'Dynamic camera movement seperti drone atau handheld',
+                lighting: 'Natural lighting dengan emphasis pada waktu terbaik',
+                duration: 'Durasi 8-15 detik untuk journey narrative',
+                tips: 'Kombinasikan landscape dan human element, musik upbeat',
+                renderingStyle: 'cinematic film grain', // Added
+                cameraPerspective: 'overhead view (drone shot)' // Added
+            },
+            business: {
+                promptStyle: 'Professional environment dengan clean aesthetics',
+                cameraMovement: 'Smooth corporate camera movement',
+                lighting: 'Cahaya office yang bright dan professional',
+                duration: 'Durasi 5-10 detik untuk corporate messaging',
+                tips: 'Focus pada teamwork, technology, dan modern workspace',
+                renderingStyle: 'realistic', // Added
+                cameraPerspective: 'normal eye-level view' // Added
+            }
+        };
+
+        // Translation function using LibreTranslate API
+        async function translateText(text, targetLang = 'en') {
+            if (!text || text.trim() === '') return text;
+
+            try {
+                const response = await fetch('https://libretranslate.de/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        q: text,
+                        source: 'id',
+                        target: targetLang,
+                        format: 'text'
+                    })
+                });
+
+                const data = await response.json();
+                return data.translatedText || text;
+            } catch (error) {
+                console.error('Translation error:', error);
+                // Fallback simple translation
+                return await fallbackTranslation(text);
+            }
+        }
+
+        // Fallback translation dengan dictionary sederhana
+        async function fallbackTranslation(text) {
+            const translations = {
+                'seorang wanita': 'a woman',
+                'seorang pria': 'a man',
+                'di pantai': 'at the beach',
+                'di studio': 'in studio',
+                'di rumah': 'at home',
+                'tersenyum': 'smiling',
+                'berjalan': 'walking',
+                'menunjukkan': 'showing',
+                'produk': 'product',
+                'smartphone': 'smartphone',
+                'kucing': 'cat',
+                'anjing': 'dog',
+                'makanan': 'food',
+                'minuman': 'drink',
+                'pemandangan': 'landscape',
+                'gunung': 'mountain',
+                'laut': 'sea',
+                'hutan': 'forest',
+                'cahaya alami': 'natural light',
+                'cahaya sore': 'sunset light',
+                'realistis': 'realistic',
+                'artistik': 'artistic',
+                'modern': 'modern',
+                'klasik': 'classic',
+                'gembira dan ceria': 'joyful and cheerful',
+                'romantis dan hangat': 'romantic and warm',
+                'serius dan profesional': 'serious and professional',
+                'santai dan rileks': 'relaxed and chill',
+                'dramatis dan menegangkan': 'dramatic and intense',
+                'misterius dan gelap': 'mysterious and dark',
+                'cahaya sore emas': 'golden hour light',
+                'cahaya studio lembut': 'soft studio light',
+                'cahaya dramatis': 'dramatic light',
+                'cahaya dari belakang': 'backlight',
+                'cahaya neon': 'neon light',
+                'seperti film bioskop': 'cinematic film-like',
+                'realistis seperti aslinya': 'realistic as real life',
+                'artistik dan kreatif': 'artistic and creative',
+                'iklan komersial': 'commercial advertisement',
+                'vintage klasik': 'vintage classic',
+                'modern dan futuristik': 'modern and futuristic',
+                'warna hangat keemasan': 'warm golden colors',
+                'warna dingin biru': 'cool blue colors',
+                'warna cerah dan hidup': 'bright and vibrant colors',
+                'warna netral dan elegan': 'neutral and elegant colors',
+                'hitam putih': 'black and white',
+                'warna pastel lembut': 'soft pastel colors',
+                'kamera diam': 'static camera',
+                'kamera bergerak perlahan': 'slow camera movement',
+                'kamera mendekat': 'camera zoom in',
+                'kamera menjauh': 'camera zoom out',
+                'kamera berputar': 'rotating camera',
+                'kamera goyang alami': 'natural camera shake',
+                'kamera dari atas': 'overhead camera (drone shot)',
+                'gambar luas': 'wide shot (full body)',
+                'gambar sedang': 'medium shot (waist up)',
+                'gambar dekat': 'close-up shot (face)',
+                'gambar sangat dekat': 'extreme close-up (eyes/detail)',
+                'gambar pemandangan': 'scenic shot',
+                'suara ombak': 'ocean waves sound',
+                'langkah kaki': 'footsteps sound',
+                'suara kota': 'city soundscape',
+                'tanpa musik': 'no music',
+                'musik tenang': 'calm music',
+                'musik orkestra': 'orchestral music',
+                'musik elektronik': 'electronic music',
+                'musik akustik': 'acoustic music',
+                'musik ceria': 'cheerful music',
+                'musik seperti film': 'film-score like music',
+                'normal eye-level view': 'normal eye-level view', // Added
+                'low angle shot': 'low angle shot', // Added
+                'high angle shot': 'high angle shot', // Added
+                'overhead view (drone shot)': 'overhead view (drone shot)', // Added
+                'first-person view': 'first-person view', // Added
+                'dutch angle': 'dutch angle', // Added
+                'realistic': 'realistic', // Added
+                'hyper-realistic': 'hyper-realistic', // Added
+                'stylized': 'stylized', // Added
+                'cartoonish': 'cartoonish', // Added
+                'abstract': 'abstract', // Added
+                'cinematic film grain': 'cinematic film grain' // Added
+            };
+
+            let translatedText = text;
+            Object.keys(translations).forEach(key => {
+                translatedText = translatedText.replace(new RegExp(key, 'gi'), translations[key]);
+            });
+
+            return translatedText;
+        }
+
+        // AI Prompt Quality Checker
+        function checkPromptQuality(prompt) {
+            let score = 0;
+            let maxScore = 100;
+            let feedback = [];
+
+            // Check length (optimal 50-200 words)
+            const wordCount = prompt.split(' ').length;
+            if (wordCount >= 50 && wordCount <= 200) {
+                score += 20;
+            } else if (wordCount < 50) {
+                feedback.push("Prompt terlalu pendek. Tambahkan lebih banyak detail.");
+            } else {
+                feedback.push("Prompt terlalu panjang. Singkat dan fokus pada hal penting.");
+            }
+
+            // Check for specific elements
+            const elements = [
+                { regex: /\b(woman|man|person|character)\b/i, points: 10, desc: "Subjek manusia" },
+                { regex: /\b(camera|shot|angle|view)\b/i, points: 10, desc: "Instruksi kamera" },
+                { regex: /\b(light|lighting|bright|dark|shadow)\b/i, points: 10, desc: "Pencahayaan" },
+                { regex: /\b(color|red|blue|green|yellow|warm|cool)\b/i, points: 5, desc: "Warna" },
+                { regex: /\b(movement|moving|walk|run|dance)\b/i, points: 10, desc: "Gerakan" },
+                { regex: /\b(background|location|setting|environment)\b/i, points: 10, desc: "Latar belakang" },
+                { regex: /\b(close-up|wide|medium|detail)\b/i, points: 10, desc: "Jenis shot" },
+                { regex: /\b(eye-level|low angle|high angle|overhead|first-person|dutch angle)\b/i, points: 5, desc: "Sudut pandang kamera" }, // Added
+                { regex: /\b(realistic|hyper-realistic|stylized|cartoonish|abstract|film grain)\b/i, points: 10, desc: "Gaya visual" } // Added
+            ];
+
+            elements.forEach(element => {
+                if (element.regex.test(prompt)) {
+                    score += element.points;
+                }
+            });
+
+            // Check for technical terms
+            const technicalTerms = [
+                'cinematic', 'professional', 'high-quality', '4K', 'HD', 'realistic',
+                'detailed', 'sharp', 'soft focus', 'depth of field', 'bokeh', 'dynamic range', 'color grading' // Added more terms
+            ];
+
+            let techTermCount = 0;
+            technicalTerms.forEach(term => {
+                if (prompt.toLowerCase().includes(term)) {
+                    techTermCount++;
+                }
+            });
+
+            if (techTermCount >= 2) {
+                score += 10;
+            }
+
+            // Determine rating
+            let rating = 1;
+            if (score >= 85) rating = 5; // Adjusted score thresholds slightly for more precision
+            else if (score >= 70) rating = 4;
+            else if (score >= 50) rating = 3;
+            else if (score >= 30) rating = 2;
+
+            return {
+                score: Math.min(score, maxScore),
+                rating: rating,
+                feedback: feedback,
+                suggestions: generateSuggestions(rating)
+            };
+        }
+
+        function generateSuggestions(rating) {
+            const suggestions = {
+                1: ["Prompt terlalu dasar. Coba tambahkan lebih banyak detail tentang subjek, lokasi, dan aktivitas.", "Sertakan instruksi spesifik tentang pencahayaan, warna, dan gaya video.", "Jelaskan gerakan kamera dan jenis shot yang diinginkan.", "Pertimbangkan untuk mengaktifkan terjemahan otomatis ke Bahasa Inggris untuk hasil yang lebih akurat."],
+                2: ["Prompt sudah lumayan, tetapi masih kurang detail visual. Jelaskan ekspresi atau interaksi subjek.", "Tambahkan detail tentang tekstur atau material objek.", "Perjelas suasana dengan kata sifat yang lebih kuat.", "Coba eksplorasi lebih banyak opsi pencahayaan dan gerakan kamera."],
+                3: ["Prompt bagus, Anda sudah mencakup banyak elemen. Untuk hasil yang lebih baik, tambahkan detail mikro seperti efek partikel atau elemen latar belakang kecil.", "Pastikan ada konsistensi gaya antara elemen visual dan audio.", "Coba gunakan kata kunci teknis yang lebih spesifik jika Anda punya preferensi tertentu."],
+                4: ["Prompt sangat baik, mendekati sempurna! Anda bisa menambahkan sentuhan akhir seperti referensi seniman atau film jika ada, atau spesifikasi detail mengenai *depth of field*.", "Pastikan semua variabel terisi penuh dan relevan."],
+                5: ["Prompt sempurna! Siap digunakan untuk hasil terbaik dari AI video Anda."]
+            };
+
+            return suggestions[rating] || suggestions[3];
+        }
+
+        // Select platform
+        // Select platform
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            document.querySelectorAll('.platform-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            // Menemukan elemen card yang diklik menggunakan event.currentTarget
+            // Karena event.target bisa jadi elemen anak (h3 atau div duration)
+            event.currentTarget.classList.add('selected'); // Perbaikan di sini
+
+            // Update duration options based on platform
+            updateDurationOptions();
+
+            // Update image input visibility
+            updateImageInputVisibility(); // <--- TAMBAHKAN INI
+        }
+
+        // Fungsi baru untuk mengontrol visibilitas input gambar
+        function updateImageInputVisibility() {
+            const imageInputGroup = document.getElementById('imageInputGroup');
+            if (selectedPlatform === 'runway') {
+                imageInputGroup.style.display = 'flex'; // Gunakan flex agar label dan input rapi
+            } else {
+                imageInputGroup.style.display = 'none';
+                document.getElementById('imageUpload').value = ''; // Bersihkan input file jika disembunyikan
+            }
+        }
+
+        // Select content type
+        function selectContentType(type) {
+            selectedContentType = type;
+            document.querySelectorAll('.content-type-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+
+            // Fill form with template
+            fillFormWithTemplate(type);
+        }
+
+        // Fill form with content template
+        function fillFormWithTemplate(type) {
+            const template = contentTemplates[type];
+            const enhancedTemplate = enhancedContentTemplates[type]; // Get enhanced template
+            if (template) {
+                document.getElementById('subjek').value = template.subjek || '';
+                document.getElementById('lokasi').value = template.lokasi || '';
+                document.getElementById('aktivitas').value = template.aktivitas || '';
+                document.getElementById('deskripsi').value = template.deskripsi || '';
+
+                // Set appropriate defaults
+                document.getElementById('suasana').value = template.suasana || 'gembira dan ceria';
+                document.getElementById('pencahayaan').value = template.pencahayaan || 'cahaya alami';
+                document.getElementById('gaya').value = template.gaya || 'seperti film bioskop';
+                document.getElementById('warna').value = template.warna || 'warna hangat keemasan';
+                document.getElementById('kamera').value = template.kamera || 'kamera diam';
+                document.getElementById('shot').value = template.shot || 'gambar luas';
+                document.getElementById('musik').value = template.musik || 'tanpa musik';
+
+                // Set new fields from enhanced template if available
+                document.getElementById('sudut_pandang').value = enhancedTemplate.cameraPerspective || 'normal eye-level view';
+                document.getElementById('gaya_visual').value = enhancedTemplate.renderingStyle || 'realistic';
+            }
+        }
+
+        // Update duration options based on platform
+        function updateDurationOptions() {
+            const durasi = document.getElementById('durasi');
+            const maxDuration = platforms[selectedPlatform].maxDuration;
+
+            // Clear existing options
+            durasi.innerHTML = '';
+
+            // Add appropriate options
+            const durations = [
+                { value: '3s', text: '3 detik', max: 3 },
+                { value: '5s', text: '5 detik', max: 5 },
+                { value: '8s', text: '8 detik', max: 8 },
+                { value: '10s', text: '10 detik', max: 10 },
+                { value: '15s', text: '15 detik', max: 15 },
+                { value: '25s', text: '25 detik', max: 25 }
+            ];
+
+            durations.forEach(duration => {
+                if (duration.max <= maxDuration) {
+                    const option = document.createElement('option');
+                    option.value = duration.value;
+                    option.textContent = duration.text;
+                    durasi.appendChild(option);
+                }
+            });
+            // Ensure selected duration is valid for the new platform
+            if (parseInt(durasi.value) > maxDuration) {
+                durasi.value = durations.find(d => d.max <= maxDuration).value;
+            }
+        }
+
+        // Toggle translate
+        function toggleTranslate() {
+            autoTranslate = !autoTranslate;
+            const toggle = document.getElementById('translateToggle');
+            toggle.classList.toggle('active', autoTranslate);
+        }
+
+        // Generate user-friendly prompt
+        // Generate user-friendly prompt
+        async function generatePrompt() {
+            const btn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            const output = document.getElementById('outputContainer');
+
+            btn.disabled = true;
+            loading.style.display = 'block';
+            output.style.display = 'none';
+
+            try {
+                // Get form values
+                const formData = {
+                    subjek: document.getElementById('subjek').value.trim(),
+                    lokasi: document.getElementById('lokasi').value.trim(),
+                    deskripsi: document.getElementById('deskripsi').value.trim(),
+                    aktivitas: document.getElementById('aktivitas').value.trim(),
+                    suasana: document.getElementById('suasana').value,
+                    pencahayaan: document.getElementById('pencahayaan').value,
+                    gaya: document.getElementById('gaya').value,
+                    warna: document.getElementById('warna').value,
+                    kamera: document.getElementById('kamera').value,
+                    shot: document.getElementById('shot').value,
+                    dialog: document.getElementById('dialog').value.trim(),
+                    suara: document.getElementById('suara').value.trim(),
+                    musik: document.getElementById('musik').value,
+                    durasi: document.getElementById('durasi').value,
+                    rasio: document.getElementById('rasio').value,
+                    sudut_pandang: document.getElementById('sudut_pandang').value,
+                    gaya_visual: document.getElementById('gaya_visual').value
+                };
+
+                // Get image file if platform is Runway
+                let imageFileName = null;
+                if (selectedPlatform === 'runway') {
+                    const imageInput = document.getElementById('imageUpload');
+                    if (imageInput.files.length > 0) {
+                        imageFileName = imageInput.files[0].name;
+                    }
+                }
+
+                // Generate base prompt in Indonesian (user-friendly)
+                let prompt = await generateUserFriendlyPromptText(formData);
+
+                // Translate if needed
+                if (autoTranslate) {
+                    prompt = await translateToEnglish(prompt);
+                }
+
+                // Optimize for platform (ini akan menambahkan "Cinematic quality..." dll)
+                prompt = optimizeForPlatform(prompt, selectedPlatform);
+
+                // Add technical enhancements (ini menambahkan detail spesifik jenis konten)
+                prompt = addTechnicalEnhancements(prompt, selectedContentType);
+
+                // --- Perubahan penting di sini: Menambahkan instruksi gambar untuk Runway ---
+                if (selectedPlatform === 'runway' && imageFileName) {
+                    prompt = `Video based on the attached image "${imageFileName}". ` + prompt;
+                }
+                // --- Akhir perubahan penting ---
+
+
+                // Check quality
+                const quality = checkPromptQuality(prompt);
+
+                // Display results
+                displayResults(prompt, quality);
+
+            } catch (error) {
+                console.error('Error generating prompt:', error);
+                alert('Terjadi kesalahan saat membuat prompt. Silakan coba lagi. Pastikan semua input dasar terisi.');
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        // Generate user-friendly prompt text (renamed for clarity)
+        async function generateUserFriendlyPromptText(data) {
+            let promptParts = [];
+
+            promptParts.push(`Buat video ${data.durasi} dengan format ${data.rasio}`);
+
+            if (data.subjek) {
+                promptParts.push(`menampilkan ${data.subjek}`);
+            }
+
+            if (data.lokasi) {
+                promptParts.push(`di ${data.lokasi}`);
+            }
+
+            if (data.deskripsi) {
+                promptParts.push(`${data.deskripsi}`);
+            }
+
+            if (data.aktivitas) {
+                promptParts.push(`Subjek sedang ${data.aktivitas}`);
+            }
+
+            promptParts.push(`dengan suasana ${data.suasana}`);
+            promptParts.push(`Gunakan ${data.pencahayaan}`);
+            promptParts.push(`dengan gaya ${data.gaya}`);
+
+            if (data.warna !== 'warna netral dan elegan') {
+                promptParts.push(`Dominasi ${data.warna}`);
+            }
+
+            if (data.kamera !== 'kamera diam') {
+                promptParts.push(`${data.kamera}`);
+            }
+
+            promptParts.push(`dengan ${data.shot}`);
+            promptParts.push(`dari sudut pandang ${data.sudut_pandang}`); // Added
+            promptParts.push(`dengan gaya visual ${data.gaya_visual}`); // Added
+
+            if (data.dialog) {
+                promptParts.push(`Teks atau ucapan: "${data.dialog}"`);
+            }
+
+            if (data.suara) {
+                promptParts.push(`Suara latar: ${data.suara}`);
+            }
+
+            if (data.musik !== 'tanpa musik') {
+                promptParts.push(`Dengan ${data.musik}`);
+            }
+
+            // Join parts with a period and space, then trim
+            return promptParts.filter(Boolean).join('. ') + '.';
+        }
+
+        // Translate to English
+        async function translateToEnglish(prompt) {
+            const translated = await translateText(prompt, 'en');
+            return translated;
+        }
+
+        // Optimize for specific platform
+        function optimizeForPlatform(prompt, platform) {
+            const optimization = platforms[platform].optimization;
+
+            let optimized = prompt;
+
+            switch (optimization) {
+                case 'cinematic':
+                    optimized += ' Cinematic quality, film-like composition, professional lighting, high dynamic range, stunning visuals, detailed rendering, 4K resolution.';
+                    break;
+                case 'creative':
+                    optimized += ' Creative artistic style, unique composition, experimental lighting, vibrant colors, abstract elements, imaginative design, high detail.';
+                    break;
+                case 'simple':
+                    optimized += ' Clean simple style, clear composition, good lighting, sharp focus, straightforward presentation, concise visuals.';
+                    break;
+                case 'technical':
+                    optimized += ' Technical precision, stable composition, consistent lighting, detailed rendering, accurate representation, high fidelity, scientific accuracy.';
+                    break;
+                case 'narrative':
+                    optimized += ' Narrative storytelling, emotional composition, mood lighting, engaging visuals, character focus, expressive, compelling.';
+                    break;
+            }
+
+            return optimized;
+        }
+
+        // Add technical enhancements
+        function addTechnicalEnhancements(prompt, contentType) {
+            const enhancements = {
+                product: ', product photography lighting, 360-degree rotation, commercial quality, clean background, macro details, smooth motion.',
+                landscape: ', natural lighting, wide angle, depth of field, organic movement, scenic composition, breathtaking view, serene atmosphere, aerial footage.',
+                conversation: ', realistic lip-sync, expressive facial animations, natural body language, clear audio, intimate setting, character chemistry, dynamic dialogue pacing.', // Lebih detail untuk percakapan
+                food: ', food photography, macro lens, steam effects, appetizing colors, soft lighting, delicious textures, close-up shots, gourmet presentation.',
+                fashion: ', fashion photography, model pose, dynamic movement, style focus, editorial lighting, runway walk, high-fashion aesthetic, sleek design.',
+                tutorial: ', instructional clarity, step-by-step, clear visibility, educational composition, hands-on demonstration, easy to follow, informative.',
+                travel: ', adventure cinematography, dynamic camera, wanderlust mood, scenic beauty, immersive experience, cultural immersion, aerial views.',
+                business: ', corporate professional, clean modern, business attire, office environment, collaborative, innovative, data visualization, modern workspace.'
+            };
+
+            return prompt + (enhancements[contentType] || '');
+        }
+
+        // Display results
+        function displayResults(prompt, quality) {
+            const output = document.getElementById('output');
+            const container = document.getElementById('outputContainer');
+            const platformInfo = document.getElementById('platformInfo');
+            const platformLink = document.getElementById('platformLink');
+
+            // Display prompt
+            output.textContent = prompt;
+
+            // Display platform info
+            platformInfo.textContent = platforms[selectedPlatform].name;
+            platformLink.href = platforms[selectedPlatform].url;
+
+            // Display quality rating
+            displayQualityRating(quality);
+
+            // Show container
+            container.style.display = 'block';
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Display quality rating
+        function displayQualityRating(quality) {
+            const starsContainer = document.getElementById('ratingStars');
+            const ratingText = document.getElementById('ratingText');
+
+            // Clear previous stars
+            starsContainer.innerHTML = '';
+
+            // Add stars
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.textContent = i < quality.rating ? '★' : '☆';
+                starsContainer.appendChild(star);
+            }
+
+            // Add text
+            const ratingTexts = {
+                1: 'Prompt perlu diperbaiki',
+                2: 'Prompt cukup baik',
+                3: 'Prompt bagus',
+                4: 'Prompt sangat baik',
+                5: 'Prompt sempurna!'
+            };
+
+            ratingText.textContent = `${ratingTexts[quality.rating]} (${quality.score}/100)`;
+
+            // Add suggestions if rating < 4
+            if (quality.rating < 4) {
+                const suggestions = quality.suggestions.join('. '); // Joined with period for better readability
+                ratingText.textContent += ` - Tips: ${suggestions}`;
+            }
+        }
+
+        // Copy prompt to clipboard
+        function copyPrompt() {
+            const output = document.getElementById('output');
+            navigator.clipboard.writeText(output.textContent).then(() => {
+                alert('Prompt berhasil disalin ke clipboard!');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+                // Fallback
+                output.select();
+                document.execCommand('copy');
+                alert('Prompt berhasil disalin ke clipboard!');
+            });
+        }
+
+        // Open translator
+        function openTranslator() {
+            const prompt = document.getElementById('output').textContent;
+            const encodedPrompt = encodeURIComponent(prompt);
+            const url = `https://translate.google.com/?sl=auto&tl=en&text=${encodedPrompt}`;
+            window.open(url, '_blank');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set default selections
+            document.querySelector('.platform-card').classList.add('selected');
+            document.querySelector('.content-type-btn').classList.add('selected');
+
+            // Initialize duration options
+            updateDurationOptions();
+
+            // Fill with default template
+            fillFormWithTemplate('product');
+        });
+    </script>
+</body>
+
+</html>
